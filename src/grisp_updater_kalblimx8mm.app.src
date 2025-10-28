@@ -1,0 +1,15 @@
+{application, grisp_updater_kalblimx8mm, [
+    {description, "GRiSP Software Updater HAL for Kontron AL/BL iMX8M Mini"},
+    {vsn, "0.1.0"},
+    {registered, []},
+    {applications, [
+        kernel,
+        stdlib,
+        grisp_uboot,
+        grisp_updater
+    ]},
+    {env, []},
+    {modules, []},
+    {licenses, ["Apache-2.0"]},
+    {links, []}
+ ]}.
