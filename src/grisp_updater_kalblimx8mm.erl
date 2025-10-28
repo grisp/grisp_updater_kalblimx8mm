@@ -286,7 +286,10 @@ uboot_load_env() ->
     maybe
         {ok, UBootConfig} ?= grisp_uboot:configuration(?UBOOT_ENV_CONFIG),
         {ok, RawUBootEnv} ?= grisp_uboot:read(UBootConfig),
-        {ok, _UBootEnv} ?= uboot_parse_env(RawUBootEnv)
+        io:format(">>>>>>>>>>> UBOOT RAW ENV: ~p~n", [RawUBootEnv]),
+        {ok, UBootEnv} ?= uboot_parse_env(RawUBootEnv),
+        io:format(">>>>>>>>>>> UBOOT ENV: ~p~n", [UBootEnv]),
+        {ok, UBootEnv}
     else
       {error, Reason} -> {error, {failed_to_uboot_load_env, Reason}}
     end.
