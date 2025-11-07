@@ -6,6 +6,7 @@
         kernel,
         stdlib,
         grisp_uboot,
+        grisp_keychain,
         grisp_updater
     ]},
     {env, [

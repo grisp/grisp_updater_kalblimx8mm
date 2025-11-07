@@ -60,7 +60,6 @@
 }).
 
 -record(http_state, {
-    tls_trans_opts :: gun:transport_opts()
 }).
 
 
@@ -246,10 +245,8 @@ system_terminate(_State, _Reason) ->
 
 %--- Behaviour grisp_updater_http Callback -------------------------------------
 
-http_init(Opts) ->
-    {ok, #http_state{
-        tls_trans_opts = prepare_tls_transport_options(Opts)
-    }}.
+http_init(_Opts) ->
+    {ok, #http_state{}}.
 
 http_connection_options(State, Url) ->
     DefOpts = #{connect_timeout => ?CONNECT_TIMEOUT},
@@ -580,37 +577,10 @@ kernel_postfix(1) -> <<"_B">>.
 
 %% TLS Transport Options
 
-load_ca_certificates() ->
-    {Certs, Errors} =
-        grisp_updater_tools:config_certificates(grisp_updater_kalblimx8mm,
-                                server_ca_certificates, "*.{crt,cer,pem}"),
-    lists:foreach(fun
-        ({priv_not_found, AppName}) ->
-            ?LOG_WARNING("Application ~s priv directory not found", [AppName]);
-        ({invalid_file_or_directory, Path}) ->
-            ?LOG_WARNING("Invalid certificate file or directory: ~s", [Path]);
-        ({read_error, Reason, Path}) ->
-            ?LOG_WARNING("Failed to read CA certificates from ~s (~p)", [Path, Reason]);
-        (Reason) ->
-            ?LOG_WARNING("Error loading some server CA cerificates: ~p", [Reason])
-    end, Errors),
-    if Certs =:= [] ->
-        ?LOG_WARNING("No valid CA certificates specified");
-        true -> ok
-    end,
-    Certs.
-
-prepare_tls_transport_options(_Opts) ->
-    CACerts = load_ca_certificates(),
-    [{verify, verify_peer}, {cacerts, CACerts}].
-
-tls_options(#http_state{tls_trans_opts = TransOpts}, Host, DefOpts) ->
+tls_options(#http_state{}, Host, DefOpts) ->
     DefOpts#{
         transport => tls,
-        transport_opts => [
-            {server_name_indication, unicode:characters_to_list(Host)}
-            | TransOpts
-        ]
+        tls_opts => grisp_keychain:tls_options(Host)
     }.
 
 %% Command Execution
